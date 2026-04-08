@@ -1,0 +1,120 @@
+:root { 
+    --bg-dark: #050505; 
+    --accent: #ff3300; 
+    --accent-glow: rgba(255, 51, 0, 0.25);
+    --paper: #f4f4f5; 
+    --text-muted: #8c8c93;
+    --transition-speed: 0.8s; 
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, sans-serif; background-color: var(--bg-dark); color: #fff; overflow: hidden; }
+
+/* Obsidian Ambient Layer */
+.ambient-background { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 50% 30%, #121214 0%, var(--bg-dark) 100%); }
+.glow-sphere { position: absolute; top: 10vh; left: 10vw; width: 40vw; height: 40vw; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 60%); filter: blur(120px); pointer-events: none; }
+
+/* --- LOBBY SIDEBAR --- */
+.sidebar { position: absolute; left: 8vw; top: 50%; transform: translateY(-50%); width: 340px; z-index: 50; transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+.sidebar-content { display: flex; flex-direction: column; gap: 1rem; }
+body.reading-mode .sidebar { opacity: 0; transform: translateY(-50%) translateX(-60px); pointer-events: none; }
+
+.brand-badge { font-size: 0.85rem; letter-spacing: 4px; color: var(--accent); font-weight: 800; text-transform: uppercase; }
+.brand { font-size: clamp(3rem, 4vw, 4.5rem); font-weight: 900; letter-spacing: -1.5px; line-height: 1.05; margin-bottom: 0.2rem; }
+.text-accent { background: linear-gradient(135deg, #ff4500, #ff8c00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.subtitle { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 2rem; font-weight: 400; }
+
+button { background: none; border: none; color: inherit; font-family: inherit; cursor: pointer; transition: all 0.3s ease; }
+.action-btn { display: flex; align-items: center; justify-content: space-between; background: #fff; color: #000; padding: 1.2rem 1.8rem; border-radius: 16px; font-weight: 800; font-size: 1.1rem; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.action-btn:hover { transform: translateY(-4px); background: var(--accent); color: #fff; box-shadow: 0 20px 40px var(--accent-glow); }
+
+/* --- EXAKTNÍ GEOMETRIE SCÉNY (Desktop PC) --- */
+.scene { 
+    position: absolute; perspective: 4000px; z-index: 10; 
+    transition: transform var(--transition-speed) cubic-bezier(0.25, 1, 0.5, 1),
+                top var(--transition-speed) cubic-bezier(0.25, 1, 0.5, 1),
+                left var(--transition-speed) cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* 1. Lobby (Closed): Sidebar zabírá levý prostor, knihu usadíme na 70% šířky.
+   Translate(-75%) garantuje, že přesně střed OBÁLKY bude ležet na kotevním bodě. */
+body:not(.reading-mode) .scene[data-state="closed"] { top: 50%; left: 70%; transform: translate(-75%, -50%) scale(0.85); cursor: pointer; }
+body:not(.reading-mode) .scene[data-state="closed"]:hover { transform: translate(-75%, -52%) scale(0.87); }
+
+/* 2. Reading (Open): Plný střed obrazovky, scale 100% */
+body.reading-mode .scene[data-state="open"] { top: 50%; left: 50%; transform: translate(-50%, -50%) scale(1); }
+
+/* 3. Reading (Ended): Střed levé strany (zadní obálky) usazen na střed obrazovky */
+body.reading-mode .scene[data-state="ended"] { top: 50%; left: 50%; transform: translate(-25%, -50%) scale(1); }
+
+.book-container { position: absolute; right: 0; width: 50%; height: 100%; transform-style: preserve-3d; }
+.book-shadow { position: absolute; top: 1%; left: 0; height: 98%; box-shadow: 0 40px 80px -10px rgba(0,0,0,0.9); z-index: -1; transition: all var(--transition-speed) cubic-bezier(0.25, 1, 0.5, 1); border-radius: 4px; }
+.scene[data-state="closed"] .book-shadow { width: 100%; transform: translateX(0); }
+.scene[data-state="open"] .book-shadow { width: 200%; transform: translateX(-50%); }
+.scene[data-state="ended"] .book-shadow { width: 100%; transform: translateX(-100%); }
+
+/* Fyzika listů */
+.leaf { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-origin: left center; transform-style: preserve-3d; transition: transform var(--transition-speed) cubic-bezier(0.645, 0.045, 0.355, 1); cursor: pointer; }
+body.reading-mode .leaf:not(.flipped):hover { transform: rotateY(-4deg); box-shadow: -15px 0 30px rgba(0,0,0,0.2); }
+body.reading-mode .leaf.flipped:hover { transform: rotateY(-176deg); box-shadow: 15px 0 30px rgba(0,0,0,0.2); }
+.leaf.flipped { transform: rotateY(-180deg); }
+
+.page { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background-color: var(--paper); background-size: cover; background-position: center; border-radius: 2px 8px 8px 2px; border: 1px solid rgba(0,0,0,0.08); }
+.page.back { transform: rotateY(180deg); border-radius: 8px 2px 2px 8px; }
+.page::after { content: ''; position: absolute; top: 0; bottom: 0; width: 8%; pointer-events: none; z-index: 2; }
+.page.front::after { left: 0; background: linear-gradient(to right, rgba(0,0,0,0.3) 0%, transparent 100%); }
+.page.back::after { right: 0; background: linear-gradient(to left, rgba(0,0,0,0.3) 0%, transparent 100%); }
+.page::before { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 1; background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%, rgba(0,0,0,0.05) 100%); opacity: 0; transition: opacity calc(var(--transition-speed) / 2); }
+.leaf.flipped .page.front::before { opacity: 1; }
+.leaf:not(.flipped) .page.back::before { opacity: 1; }
+
+/* --- HUD PANEL --- */
+.hud-container { position: absolute; bottom: 4vh; left: 50%; transform: translateX(-50%) translateY(50px); opacity: 0; pointer-events: none; transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); z-index: 100; }
+body.reading-mode .hud-container { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+
+.glass-panel { background: rgba(15, 15, 18, 0.75); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.08); border-radius: 100px; display: flex; align-items: center; padding: 0.5rem 0.8rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.9); }
+.divider { width: 1px; height: 24px; background: rgba(255,255,255,0.1); margin: 0 10px; }
+
+.icon-btn { padding: 0.6rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: 0.2s; }
+.icon-btn:hover { color: #fff; background: rgba(255,255,255,0.08); transform: scale(1.1); }
+.close-btn:hover { color: #ff3300; background: rgba(255, 51, 0, 0.1); }
+
+.slider-group { display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+.slider-group.hidden { display: none; }
+
+.page-slider { -webkit-appearance: none; appearance: none; width: 140px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; outline: none; cursor: pointer; }
+.page-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #fff; cursor: pointer; transition: 0.2s; box-shadow: 0 0 10px rgba(255,255,255,0.3); }
+.page-slider::-webkit-slider-thumb:hover { transform: scale(1.4); background: var(--accent); }
+
+.page-indicator-group { display: flex; align-items: center; font-variant-numeric: tabular-nums; font-size: 0.95rem; color: var(--text-muted); width: 75px; justify-content: center; }
+.page-input { background: transparent; border: none; color: #fff; font-family: inherit; font-size: inherit; text-align: right; width: 28px; outline: none; padding-right: 4px; -moz-appearance: textfield; font-weight: 700; }
+.page-input:focus { color: var(--accent); }
+.page-input::-webkit-outer-spin-button, .page-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.rewind-group { display: none; align-items: center; padding: 0 4px; }
+.rewind-group.active { display: flex; animation: fadeIn 0.4s ease forwards; }
+.rewind-btn { display: flex; align-items: center; gap: 8px; background: var(--accent); color: #fff; font-weight: 800; font-size: 0.95rem; text-transform: uppercase; padding: 0.6rem 1.4rem; border-radius: 50px; transition: 0.3s; letter-spacing: 0.5px; }
+.rewind-btn:hover { background: #fff; color: #000; box-shadow: 0 0 20px var(--accent-glow); transform: scale(1.05); }
+@keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+
+/* --- TELEFONY & TABLETY (OMEGA Responzivita) --- */
+@media (max-width: 900px) {
+    /* Menu vytaženo výše, vycentrováno */
+    .sidebar { left: 50%; top: 22vh; transform: translate(-50%, -50%); width: 85vw; text-align: center; }
+    body.reading-mode .sidebar { opacity: 0; transform: translate(-50%, -60vh); }
+    .action-btn { justify-content: center; gap: 12px; }
+    
+    /* 1. Mobilní Lobby: Knihu posuneme extrémně nízko a zmenšíme pomocí GPU (scale: 0.65) */
+    body:not(.reading-mode) .scene[data-state="closed"] { left: 50%; top: 72vh; transform: translate(-75%, -50%) scale(0.65); }
+    body:not(.reading-mode) .scene[data-state="closed"]:hover { transform: translate(-75%, -50%) scale(0.65); }
+    
+    /* 2. Mobilní Čtení: Knihu vrátíme do optického středu a dáme jí plnou velikost */
+    body.reading-mode .scene[data-state="open"] { left: 50%; top: 46vh; transform: translate(-50%, -50%) scale(1); }
+    body.reading-mode .scene[data-state="ended"] { left: 50%; top: 46vh; transform: translate(-25%, -50%) scale(1); }
+    
+    .hud-container { bottom: 3vh; width: 90vw; max-width: 380px; }
+    .glass-panel { width: 100%; justify-content: space-between; padding: 0.5rem 0.6rem; }
+    .page-slider { width: 90px; }
+    .rewind-group { width: 100%; justify-content: center; }
+    .rewind-btn { width: 100%; justify-content: center; padding: 0.8rem; }
+}

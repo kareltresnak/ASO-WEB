@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Magazín | Projekt OMEGA</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="ambient-background">
+        <div class="glow-sphere"></div>
+    </div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+            <h1 class="brand">ŽIVOT BEZ<br><span class="text-accent">HRANIC</span></h1>
+            <p class="subtitle">Exkluzivní interaktivní vydání.</p>
+            
+            <button id="openMagBtn" class="action-btn">
+                <span>Číst magazín</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+        </div>
+    </nav>
+
+    <div class="scene" id="scene" data-state="closed">
+        <div class="book-container" id="bookContainer">
+            </div>
+    </div>
+
+    <div class="hud-container" id="hudContainer">
+        <div class="glass-panel">
+            <button id="closeMagBtn" class="icon-btn close-btn" title="Zavřít magazín">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+
+            <div class="divider"></div>
+
+            <div class="slider-group" id="sliderGroup">
+                <button id="prevBtn" class="icon-btn"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></button>
+                
+                <input type="range" min="0" max="10" value="0" class="page-slider" id="pageSlider">
+                
+                <div class="page-indicator-group">
+                    <input type="number" id="pageInput" class="page-input" value="1" min="1">
+                    <span id="pageTotal" class="page-total">/ 6</span>
+                </div>
+                
+                <button id="nextBtn" class="icon-btn"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></button>
+            </div>
+
+            <div class="rewind-group" id="rewindGroup">
+                <button id="rewindBtn" class="rewind-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
+                    <span>Na začátek</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
