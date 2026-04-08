@@ -53,9 +53,3 @@ V kontextu tohoto projektu je `scene` jevištěm a kód scénářem. Přechod ze
 
 ---
 
-## 🔴 Red Pen Critique (Analýza kvality)
-
-* **Architektura:** Čistý Vanilla JS bez balastu. Skvělá implementace asynchronního listování.
-* **UX:** Výborný handling mobilních zařízení přes dynamické `scale(0.65)` v Lobby stavu.
-* **Kritika:** Implementace postrádá *pre-fetching* obrázků. U pomalého připojení může dojít k problikávání bílých stran. Doporučuji přidat `Intersection Observer` nebo jednoduchý preload sousedních stran pro absolutní plynulost zážitku.
-* **Verdikt:** Technicky precizní řešení splňující akademické standardy pro pokročilý frontendový vývoj.
